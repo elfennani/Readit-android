@@ -1,23 +1,21 @@
 package com.elfennani.readit.compose
 
-import android.util.Log
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.elfennani.readit.compose.home.HomeFeed
 import com.elfennani.readit.compose.login.ExchangeTokenScreen
 import com.elfennani.readit.compose.login.LoginScreen
 
 @Composable
-fun ReaditApp(code: String?) {
+fun ReaditApp(code: String?, user: String?) {
     val navController = rememberNavController()
-    val startRoute =
-        if (code == null) Screen.LoginScreen.route else Screen.ExchangeToken.createRoute(code)
+    val startRoute = when {
+        code != null -> Screen.ExchangeToken.route
+        user != null -> Screen.HomePage.route
+        else -> Screen.LoginScreen.route
+    }
 
     NavHost(navController = navController, startDestination = startRoute) {
         composable(
@@ -27,9 +25,11 @@ fun ReaditApp(code: String?) {
         }
 
         composable(
-            Screen.HomePage.route, Screen.HomePage.navArgs
+            Screen.HomePage.route,
+            arguments = Screen.HomePage.createArgs(user)
         ) {
-            Text(text = "Not implemented yet")
+            val userId = checkNotNull(it.arguments?.getString("userId"))
+            HomeFeed(navController = navController, userId = userId)
         }
 
         composable(

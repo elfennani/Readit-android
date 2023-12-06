@@ -15,7 +15,15 @@ sealed class Screen(
         navArgs = listOf(navArgument("userId") {
             type = NavType.StringType
         })
-    )
+    ){
+        fun createRoute(userId:String) = "home/$userId"
+        fun createArgs(userId: String?) = listOf(navArgument("userId"){
+            type = NavType.StringType
+            if(userId != null){
+                defaultValue = userId
+            }
+        })
+    }
 
     data object ExchangeToken : Screen(
         route = "exchange/{code}",

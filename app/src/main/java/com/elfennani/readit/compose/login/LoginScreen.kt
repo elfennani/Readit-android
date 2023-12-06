@@ -40,7 +40,7 @@ fun LoginScreen(
                     modifier = Modifier.fillMaxWidth()
                 )
             }
-            Box(modifier = Modifier.padding(16.dp)) {
+            Box(modifier = Modifier.padding(24.dp)) {
                 Button(onClick = { viewModel.initiateLogin(context) }, modifier = Modifier.fillMaxWidth()) {
                     Text(text = "Login using Reddit")
                 }

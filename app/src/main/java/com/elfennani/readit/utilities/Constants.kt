@@ -6,3 +6,4 @@ const val AUTH_STATE = "READIT1";
 const val AUTH_REDIRECT = "readit://redirect"
 const val CLIENT_ID = "jZxbCi8nroDGjr_X7ss5AQ"
 val AUTH_SCOPES = listOf("identity", "edit", "flair", "history", "modconfig", "modflair", "modlog", "modposts", "modwiki", "mysubreddits", "privatemessages", "read", "report", "save", "submit", "subscribe", "vote", "wikiedit", "wikiread")
+val BASE_URL = "https://oauth.reddit.com"
