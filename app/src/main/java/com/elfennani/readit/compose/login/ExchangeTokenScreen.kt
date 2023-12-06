@@ -26,7 +26,7 @@ fun ExchangeTokenScreen(
     code: String
 ) {
     LaunchedEffect(code) {
-        loginViewModel.exchangeCode()
+        loginViewModel.exchangeCode(code)
     }
 
     Scaffold {
