@@ -3,7 +3,11 @@ package com.elfennani.readit.data.remote.dto.user_api
 
 import com.google.gson.annotations.SerializedName
 
-data class AuthUserMe(
+fun ApiUser.toUser(){
+
+}
+
+data class ApiUser(
     @SerializedName("accept_followers")
     val acceptFollowers: Boolean,
     @SerializedName("awardee_karma")

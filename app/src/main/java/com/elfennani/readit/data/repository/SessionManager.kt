@@ -20,6 +20,9 @@ constructor(
   private val userApi: UserApi,
   private val sessionDao: SessionDao
 ) {
+
+  private val authorization = "Basic ${encodeBase64("$CLIENT_ID:")}"
+
   private fun encodeBase64(value: String): String {
     val encoder = Base64.getEncoder()
     val encoded = encoder.encode(value.toByteArray())
@@ -29,7 +32,7 @@ constructor(
   suspend fun addSession(code: String) {
     val retrievalResponse =
       authApi.retrieveAccessToken(
-        authorization = "Basic ${encodeBase64("$CLIENT_ID:")}",
+        authorization = authorization,
         code = code,
       )
 
@@ -45,11 +48,31 @@ constructor(
       )
     )
 
+    updateCurrentUser(user.id)
+  }
+
+  private fun updateCurrentUser(userId: String){
     val prefs = context.getSharedPreferences("prefs", ComponentActivity.MODE_PRIVATE)
 
     with(prefs.edit()) {
-      putString("userId", user.id)
+      putString("userId", userId)
       commit()
     }
+  }
+
+  suspend fun refreshSession(userId: String) {
+    val oldSession = sessionDao.getSessionByUserId(userId)
+    val refreshTokenResponse =
+      authApi.refreshAccessToken(
+        authorization = authorization,
+        refreshToken = oldSession.refreshToken,
+      )
+
+    sessionDao.upsertSession(
+      oldSession.copy(
+        accessToken = refreshTokenResponse.accessToken,
+        expiration = Instant.now().epochSecond + refreshTokenResponse.expiresIn
+      )
+    )
   }
 }
