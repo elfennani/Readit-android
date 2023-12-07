@@ -1,4 +1,4 @@
-package com.elfennani.readit.data
+package com.elfennani.readit.data.local
 
 import androidx.room.Dao
 import androidx.room.Query

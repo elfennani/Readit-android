@@ -1,12 +1,12 @@
-package com.elfennani.readit.compose
+package com.elfennani.readit.presentation
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.elfennani.readit.compose.home.HomeFeed
-import com.elfennani.readit.compose.login.ExchangeTokenScreen
-import com.elfennani.readit.compose.login.LoginScreen
+import com.elfennani.readit.presentation.auth.ExchangeTokenScreen
+import com.elfennani.readit.presentation.homefeed.HomeFeed
+import com.elfennani.readit.presentation.login.LoginScreen
 
 @Composable
 fun ReaditApp(code: String?, user: String?) {
@@ -33,7 +33,7 @@ fun ReaditApp(code: String?, user: String?) {
         }
 
         composable(
-            Screen.ExchangeToken.route, Screen.ExchangeToken.navArgs
+            Screen.ExchangeToken.route, Screen.ExchangeToken.createArgs(code)
         ) {
             ExchangeTokenScreen(
                 code = code ?: ""

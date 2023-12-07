@@ -1,8 +1,7 @@
-package com.elfennani.readit.data
+package com.elfennani.readit.data.local
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import java.time.Instant
 
 @Entity("users")
 data class User(

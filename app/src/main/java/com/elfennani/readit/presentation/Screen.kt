@@ -1,4 +1,4 @@
-package com.elfennani.readit.compose
+package com.elfennani.readit.presentation
 
 import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavType
@@ -34,5 +34,12 @@ sealed class Screen(
         )
     ){
         fun createRoute(code:String) = "exchange/$code"
+
+        fun createArgs(code: String?) = listOf(navArgument("code"){
+            type = NavType.StringType
+            if(code != null){
+                defaultValue = code
+            }
+        })
     }
 }

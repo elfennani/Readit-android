@@ -1,4 +1,4 @@
-package com.elfennani.readit.compose.home
+package com.elfennani.readit.presentation.homefeed.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -35,9 +35,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import com.elfennani.readit.data.User
-import com.elfennani.readit.utilities.formatEpoch
+import com.elfennani.readit.data.local.User
+import com.elfennani.readit.utilities.formatDifferenceSeconds
 import com.valentinilk.shimmer.shimmer
+import java.time.Instant
 
 @Composable
 fun UserProfile(user: User?) {
@@ -165,7 +166,7 @@ fun UserProfile(user: User?) {
                     }
                 }
                 Text(text = labelText(user.karma.toString(), "karma"), fontSize = 14.sp)
-                Text(text = labelText(formatEpoch(user.created, true), "age"), fontSize = 14.sp)
+                Text(text = labelText(formatDifferenceSeconds(Instant.now().epochSecond -  user.created, true), "age"), fontSize = 14.sp)
             }
         }
     }

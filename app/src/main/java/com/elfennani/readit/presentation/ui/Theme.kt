@@ -1,4 +1,4 @@
-package com.elfennani.readit.ui
+package com.elfennani.readit.presentation.ui
 
 import android.app.Activity
 import android.os.Build
