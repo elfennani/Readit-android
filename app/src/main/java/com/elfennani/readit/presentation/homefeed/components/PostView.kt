@@ -1,5 +1,6 @@
 package com.elfennani.readit.presentation.homefeed.components
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -13,6 +14,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -47,7 +50,7 @@ import com.elfennani.readit.domain.model.Subreddit
 import com.elfennani.readit.utilities.formatDifferenceSeconds
 import java.time.Instant
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun PostView(post: Post, onPostPress: ((Post) -> Unit)? = null) {
     val age by
@@ -55,6 +58,7 @@ fun PostView(post: Post, onPostPress: ((Post) -> Unit)? = null) {
             derivedStateOf { formatDifferenceSeconds(Instant.now().epochSecond - post.created) }
         }
     val subIconUrl = post.subredditDetails.icon
+    val pagerState = rememberPagerState(pageCount = { post.images?.size ?: 0 })
 
     Card(
         shape = RectangleShape,
@@ -106,16 +110,32 @@ fun PostView(post: Post, onPostPress: ((Post) -> Unit)? = null) {
             Spacer(Modifier.height(12.dp))
 
             if (!post.images.isNullOrEmpty()) {
-                val firstImage = post.images[0]
+                if (post.images.size > 1) {
+                    HorizontalPager(state = pagerState) {
+                        val firstImage = post.images[it]
 
-                AsyncImage(
-                    model = firstImage.url,
-                    contentDescription = null,
-                    modifier =
-                        Modifier.fillMaxWidth().aspectRatio(firstImage.width.toFloat() / firstImage.height)
-                )
+                        AsyncImage(
+                            model = firstImage.url,
+                            contentDescription = null,
+                            modifier =
+                                Modifier.fillMaxWidth()
+                                    .aspectRatio(firstImage.width.toFloat() / firstImage.height)
+                        )
+                    }
+                } else {
+                    val firstImage = post.images[0]
+
+                    AsyncImage(
+                        model = firstImage.url,
+                        contentDescription = null,
+                        modifier =
+                            Modifier.fillMaxWidth()
+                                .aspectRatio(firstImage.width.toFloat() / firstImage.height)
+                    )
+                }
             }
             Spacer(Modifier.height(12.dp))
+
             Row(
                 Modifier.padding(16.dp, 0.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
