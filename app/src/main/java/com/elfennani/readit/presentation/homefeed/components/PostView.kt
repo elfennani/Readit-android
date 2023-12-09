@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -102,6 +103,18 @@ fun PostView(post: Post, onPostPress: ((Post) -> Unit)? = null) {
                 lineHeight = 20.sp,
                 fontWeight = FontWeight.Medium
             )
+            Spacer(Modifier.height(12.dp))
+
+            if (!post.images.isNullOrEmpty()) {
+                val firstImage = post.images[0]
+
+                AsyncImage(
+                    model = firstImage.url,
+                    contentDescription = null,
+                    modifier =
+                        Modifier.fillMaxWidth().aspectRatio(firstImage.width.toFloat() / firstImage.height)
+                )
+            }
             Spacer(Modifier.height(12.dp))
             Row(
                 Modifier.padding(16.dp, 0.dp),

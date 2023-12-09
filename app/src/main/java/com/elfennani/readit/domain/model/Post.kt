@@ -8,5 +8,6 @@ data class Post(
     val subreddit: String,
     val score: Int,
     val commentsSize: Int,
-    val subredditDetails: Subreddit
+    val subredditDetails: Subreddit,
+    val images: List<Image>? = null
 )
