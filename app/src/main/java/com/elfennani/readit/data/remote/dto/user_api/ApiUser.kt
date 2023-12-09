@@ -1,11 +1,19 @@
 package com.elfennani.readit.data.remote.dto.user_api
 
 
+import com.elfennani.readit.domain.model.User
 import com.google.gson.annotations.SerializedName
+import org.jsoup.Jsoup
+import java.time.Instant
 
-fun ApiUser.toUser(){
-
-}
+fun ApiUser.toUser() : User = User(
+    id = id,
+    username = "u/$name",
+    fullName = if (subreddit.title == "") null else subreddit.title,
+    age = (Instant.now().epochSecond - created).toLong(),
+    profile = Jsoup.parse(iconImg).text(),
+    totalKarma = totalKarma
+)
 
 data class ApiUser(
     @SerializedName("accept_followers")

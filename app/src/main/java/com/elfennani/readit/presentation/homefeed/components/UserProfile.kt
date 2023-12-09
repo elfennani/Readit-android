@@ -35,10 +35,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import com.elfennani.readit.data.local.User
+import com.elfennani.readit.domain.model.User
 import com.elfennani.readit.utilities.formatDifferenceSeconds
 import com.valentinilk.shimmer.shimmer
-import java.time.Instant
 
 @Composable
 fun UserProfile(user: User?) {
@@ -105,7 +104,7 @@ fun UserProfile(user: User?) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 AsyncImage(
-                    model = user.profilePictureUrl,
+                    model = user.profile,
                     contentDescription = null,
                     modifier = Modifier
                         .width(56.dp)
@@ -141,13 +140,13 @@ fun UserProfile(user: User?) {
                     fontWeight = FontWeight.SemiBold
                 )
                 Text(
-                    text = "u/${user.username}",
+                    text = user.username,
                     color = Color.Gray,
                     fontSize = 14.sp
                 )
             } else {
                 Text(
-                    text = "u/${user.username}",
+                    text = user.username,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.SemiBold
                 )
@@ -165,8 +164,8 @@ fun UserProfile(user: User?) {
                         }
                     }
                 }
-                Text(text = labelText(user.karma.toString(), "karma"), fontSize = 14.sp)
-                Text(text = labelText(formatDifferenceSeconds(Instant.now().epochSecond -  user.created, true), "age"), fontSize = 14.sp)
+                Text(text = labelText(user.totalKarma.toString(), "karma"), fontSize = 14.sp)
+                Text(text = labelText(formatDifferenceSeconds(user.age, true), "age"), fontSize = 14.sp)
             }
         }
     }
@@ -183,14 +182,11 @@ fun UserProfilePreview() {
         UserProfile(
             user = User(
                 id = "",
-                tokenExpiration = 0,
-                refreshToken = "",
-                accessToken = "",
-                profilePictureUrl = "https://styles.redditmedia.com/t5_vjcux/styles/profileIcon_snoo4eb7f2fb-0e85-4c4d-8ec2-0ee989b23566-headshot-f.png?width=256&height=256&crop=256:256,smart&s=1e981ef29c72b2db0f07ad1f2e48b28b490d9f8f",
+                profile = "https://styles.redditmedia.com/t5_vjcux/styles/profileIcon_snoo4eb7f2fb-0e85-4c4d-8ec2-0ee989b23566-headshot-f.png?width=256&height=256&crop=256:256,smart&s=1e981ef29c72b2db0f07ad1f2e48b28b490d9f8f",
                 fullName = "Nizar Elfennani",
-                karma = 23123,
-                created = 1548694396,
-                username = "elfennani"
+                totalKarma = 23123,
+                age = 153284409,
+                username = "u/elfennani"
             )
         )
     }

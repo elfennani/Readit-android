@@ -1,5 +1,6 @@
 package com.elfennani.readit.presentation.auth
 
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
@@ -9,7 +10,6 @@ import com.elfennani.readit.common.ResourceDataLess
 import com.elfennani.readit.data.repository.SessionManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import retrofit2.HttpException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -28,10 +28,10 @@ constructor(
         _state.value = ResourceDataLess.Loading
         sessionManager.addSession(code)
         _state.value = ResourceDataLess.Success
-        }catch (e: HttpException){
-          _state.value = ResourceDataLess.Error(e.message())
-        }catch (e:Exception) {
+        }
+        catch (e:Exception) {
           _state.value = ResourceDataLess.Error("Something unexpected occurred")
+          Log.e("AUTHERROR", e.message.toString())
         }
       }
     }
