@@ -1,6 +1,5 @@
 package com.elfennani.readit.presentation.homefeed
 
-import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
@@ -22,47 +21,46 @@ import javax.inject.Inject
 class HomeFeedViewModel
 @Inject
 constructor(private val oAuthApi: OAuthApi, private val savedStateHandle: SavedStateHandle) :
-  ViewModel() {
-  private val _userState = mutableStateOf<Resource<User>>(Resource.Loading())
-  val userState: State<Resource<User>> = _userState
+    ViewModel() {
+    private val _userState = mutableStateOf<Resource<User>>(Resource.Loading())
+    val userState: State<Resource<User>> = _userState
 
-  private val _feedState = MutableStateFlow<List<Post>>(emptyList())
-  val feedState : StateFlow<List<Post>> = _feedState
+    private val _feedState = MutableStateFlow<List<Post>>(emptyList())
+    val feedState: StateFlow<List<Post>> = _feedState
 
-  private val _isFetchingNextPage = mutableStateOf(false)
-  val isFetchingNextPage : State<Boolean> = _isFetchingNextPage
+    private var isFetchingNextPage = false
 
-  private var after : String? = null
+    private var after: String? = null
 
-  init {
-    savedStateHandle.get<String>("userId")?.let { loadUser(it) }
-    fetchNextPage()
-  }
-
-  fun fetchNextPage(){
-    if(_isFetchingNextPage.value) return;
-
-    viewModelScope.launch {
-      _isFetchingNextPage.value = true
-      Log.d("FETCHINGNEXTPAGE", after.toString())
-      try {
-        val feedResponse = oAuthApi.getBestFeed(after)
-        _feedState.value = _feedState.value + feedResponse.data.children.map { it.data.toPost() }
-        after = feedResponse.data.after
-      }finally {
-          _isFetchingNextPage.value = false
-      }
+    init {
+        savedStateHandle.get<String>("userId")?.let { loadUser(it) }
+        fetchNextPage()
     }
-  }
 
-  private fun loadUser(userId: String) {
-    viewModelScope.launch {
-      try {
-        _userState.value = Resource.Loading()
-        _userState.value = Resource.Success(data = oAuthApi.getIdentity().toUser())
-      } catch (e: Exception) {
-        _userState.value = Resource.Error(message = "Something wrong occurred")
-      }
+    fun fetchNextPage() {
+        if (isFetchingNextPage) return
+        isFetchingNextPage = true
+
+        viewModelScope.launch {
+            try {
+                val feedResponse = oAuthApi.getBestFeed(after)
+                val feedMapped = feedResponse.data.children.map { it.data.toPost() }
+                _feedState.value = _feedState.value + feedMapped
+                after = feedResponse.data.after
+            } finally {
+                isFetchingNextPage = false
+            }
+        }
     }
-  }
+
+    private fun loadUser(userId: String) {
+        viewModelScope.launch {
+            try {
+                _userState.value = Resource.Loading()
+                _userState.value = Resource.Success(data = oAuthApi.getIdentity().toUser())
+            } catch (e: Exception) {
+                _userState.value = Resource.Error(message = "Something wrong occurred")
+            }
+        }
+    }
 }
