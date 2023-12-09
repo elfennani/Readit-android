@@ -1,12 +1,18 @@
 package com.elfennani.readit.presentation.homefeed
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.rounded.Menu
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -18,11 +24,14 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -39,13 +48,20 @@ fun HomeFeed(
     homeFeedViewModel: HomeFeedViewModel = hiltViewModel()
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val lazyListState = rememberLazyListState()
     val scope = rememberCoroutineScope()
     val state = homeFeedViewModel.userState
     val data = homeFeedViewModel.feedState.collectAsState()
-    val distinctFeed by remember {
-        derivedStateOf {
-            data.value.distinctBy { it.id }
-        }
+    val distinctFeed by remember { derivedStateOf { data.value.distinctBy { it.id } } }
+
+
+    LaunchedEffect(key1 = lazyListState) {
+        snapshotFlow { lazyListState.firstVisibleItemIndex }
+            .collect {
+                if (it >= distinctFeed.size - 7) {
+                    homeFeedViewModel.fetchNextPage()
+                }
+            }
     }
 
     ModalNavigationDrawer(
@@ -75,12 +91,23 @@ fun HomeFeed(
                 )
             }
         ) {
-            LazyColumn(verticalArrangement = Arrangement.spacedBy(4.dp), contentPadding = it) {
+            LazyColumn(
+                state = lazyListState,
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = it
+            ) {
                 itemsIndexed(distinctFeed, key = { _, post -> post.id }) { index, post ->
                     PostView(post = post)
-
-                    if (index >= data.value.size - 2) {
-                        homeFeedViewModel.fetchNextPage()
+                }
+                if (homeFeedViewModel.isFetchingNextPage.value) {
+                    item {
+                        Column(
+                            Modifier.padding(24.dp).fillMaxWidth(),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            CircularProgressIndicator()
+                        }
                     }
                 }
             }

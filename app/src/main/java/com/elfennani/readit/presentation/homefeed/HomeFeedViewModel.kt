@@ -28,7 +28,8 @@ constructor(private val oAuthApi: OAuthApi, private val savedStateHandle: SavedS
     private val _feedState = MutableStateFlow<List<Post>>(emptyList())
     val feedState: StateFlow<List<Post>> = _feedState
 
-    private var isFetchingNextPage = false
+    private var _isFetchingNextPage = mutableStateOf(false)
+    val isFetchingNextPage: State<Boolean> = _isFetchingNextPage
 
     private var after: String? = null
 
@@ -38,17 +39,17 @@ constructor(private val oAuthApi: OAuthApi, private val savedStateHandle: SavedS
     }
 
     fun fetchNextPage() {
-        if (isFetchingNextPage) return
-        isFetchingNextPage = true
+        if (_isFetchingNextPage.value) return
 
         viewModelScope.launch {
+            _isFetchingNextPage.value = true
             try {
                 val feedResponse = oAuthApi.getBestFeed(after)
                 val feedMapped = feedResponse.data.children.map { it.data.toPost() }
                 _feedState.value = _feedState.value + feedMapped
                 after = feedResponse.data.after
             } finally {
-                isFetchingNextPage = false
+                _isFetchingNextPage.value = false
             }
         }
     }
