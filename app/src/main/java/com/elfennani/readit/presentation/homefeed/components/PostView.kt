@@ -1,6 +1,8 @@
 package com.elfennani.readit.presentation.homefeed.components
 
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -40,14 +42,22 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.painter.BrushPainter
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.media3.common.MediaItem
+import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.ui.PlayerView
 import coil.compose.AsyncImage
 import com.elfennani.readit.domain.model.Post
 import com.elfennani.readit.domain.model.Subreddit
 import com.elfennani.readit.utilities.formatDifferenceSeconds
+import com.ireward.htmlcompose.HtmlText
 import java.time.Instant
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -73,7 +83,22 @@ fun PostView(post: Post, onPostPress: ((Post) -> Unit)? = null) {
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 if (subIconUrl == null || subIconUrl == "") {
-                    Box(modifier = Modifier.size(32.dp))
+                    Box(
+                        modifier =
+                            Modifier.clip(RoundedCornerShape(100.dp))
+                                .background(
+                                    Color(post.subredditDetails.color ?: Color.Blue.toArgb())
+                                )
+                                .size(32.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "r/",
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 18.sp
+                        )
+                    }
                 } else {
                     AsyncImage(
                         model = subIconUrl,
@@ -109,17 +134,34 @@ fun PostView(post: Post, onPostPress: ((Post) -> Unit)? = null) {
             )
             Spacer(Modifier.height(12.dp))
 
+            if (post.video != null) {
+                val context = LocalContext.current
+                val exoPlayer = remember {
+                    ExoPlayer.Builder(context).build().apply {
+                        setMediaItem(MediaItem.fromUri(post.video.url))
+                        prepare()
+                    }
+                }
+
+                AndroidView(
+                    factory = { PlayerView(it).apply { player = exoPlayer } },
+                    modifier =
+                        Modifier.fillMaxWidth()
+                            .aspectRatio(post.video.width.toFloat() / post.video.height)
+                )
+            }
+
             if (!post.images.isNullOrEmpty()) {
                 if (post.images.size > 1) {
                     HorizontalPager(state = pagerState) {
-                        val firstImage = post.images[it]
+                        val image = post.images[it]
 
                         AsyncImage(
-                            model = firstImage.url,
+                            model = image.url,
                             contentDescription = null,
                             modifier =
                                 Modifier.fillMaxWidth()
-                                    .aspectRatio(firstImage.width.toFloat() / firstImage.height)
+                                    .aspectRatio(image.width.toFloat() / image.height)
                         )
                     }
                 } else {
@@ -133,9 +175,24 @@ fun PostView(post: Post, onPostPress: ((Post) -> Unit)? = null) {
                                 .aspectRatio(firstImage.width.toFloat() / firstImage.height)
                     )
                 }
+                //                Spacer(Modifier.height(12.dp))
             }
-            Spacer(Modifier.height(12.dp))
 
+            if (!post.html.isNullOrEmpty()) {
+                HtmlText(
+                    text = post.html,
+                    modifier = Modifier.padding(16.dp, 0.dp),
+                    style =
+                        TextStyle(
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            lineHeight = 20.sp
+                        ),
+                    linkClicked = { Log.d("LINKCLICKED", it) },
+                    maxLines = 3
+                )
+            }
+
+            Spacer(Modifier.height(12.dp))
             Row(
                 Modifier.padding(16.dp, 0.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
@@ -201,7 +258,9 @@ fun PostViewPreview() {
                     author = "FakeDreamsFakeHope",
                     id = "18cljw6",
                     created = 1701917350,
-                    subredditDetails = Subreddit(id = "", title = "SideProject", icon = null)
+                    html = null,
+                    subredditDetails =
+                        Subreddit(id = "", title = "SideProject", icon = null, color = null)
                 ),
         )
     }

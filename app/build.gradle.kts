@@ -6,6 +6,7 @@ plugins {
 
 }
 
+
 android {
     namespace = "com.elfennani.readit"
     compileSdk = 34
@@ -56,6 +57,12 @@ android {
 
 dependencies {
 
+    implementation("androidx.media3:media3-exoplayer:1.2.0")
+    implementation("androidx.media3:media3-exoplayer-hls:1.2.0")
+    implementation("androidx.media3:media3-exoplayer-dash:1.2.0")
+    implementation("androidx.media3:media3-ui:1.2.0")
+
+    implementation("com.github.viluahealthcare:compose-html:1.0.3")
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
 

@@ -2,6 +2,7 @@ package com.elfennani.readit.data.remote.dto
 
 import com.elfennani.readit.domain.model.Image
 import com.elfennani.readit.domain.model.Post
+import com.elfennani.readit.domain.model.Video
 import com.google.gson.annotations.SerializedName
 import org.jsoup.Jsoup
 
@@ -16,7 +17,10 @@ data class PostDto(
     @SerializedName("sr_detail") val srDetails: SubredditDto,
     @SerializedName("gallery_data") val galleryData: GalleryDataDto?,
     @SerializedName("media_metadata") val mediaMetadata: Map<String, MediaMetadataDto>?,
-    val preview: PostPreviewDto?
+    @SerializedName("selftext_html") val selftextHtml: String?,
+    @SerializedName("is_video") val isVideo: Boolean,
+    val media: PostMediaDto?,
+    val preview: PostPreviewDto?,
 )
 
 fun PostDto.toPost(): Post {
@@ -57,6 +61,15 @@ fun PostDto.toPost(): Post {
         subreddit = subreddit,
         title = Jsoup.parse(title).text(),
         subredditDetails = srDetails.toSubreddit(),
-        images = images
+        images = images,
+        html = if (selftextHtml != null) Jsoup.parse(selftextHtml).text() else null,
+        video =
+            if (isVideo && media != null)
+                Video(
+                    url = Jsoup.parse(media.redditVideo.hlsUrl).text(),
+                    width = media.redditVideo.width,
+                    height = media.redditVideo.height
+                )
+            else null
     )
 }

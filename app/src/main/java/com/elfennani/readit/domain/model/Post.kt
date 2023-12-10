@@ -9,5 +9,7 @@ data class Post(
     val score: Int,
     val commentsSize: Int,
     val subredditDetails: Subreddit,
-    val images: List<Image>? = null
+    val html: String?,
+    val images: List<Image>? = null,
+    val video: Video? = null
 )
