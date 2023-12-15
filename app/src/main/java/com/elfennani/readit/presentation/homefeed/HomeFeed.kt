@@ -36,9 +36,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.elfennani.readit.domain.model.Post
+import com.elfennani.readit.presentation.Screen
 import com.elfennani.readit.presentation.homefeed.components.PostView
 import com.elfennani.readit.presentation.homefeed.components.UserProfile
+import com.google.gson.Gson
 import kotlinx.coroutines.launch
+import java.net.URLEncoder
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -53,7 +57,6 @@ fun HomeFeed(
     val state = homeFeedViewModel.userState
     val data = homeFeedViewModel.feedState.collectAsState()
     val distinctFeed by remember { derivedStateOf { data.value.distinctBy { it.id } } }
-
 
     LaunchedEffect(key1 = lazyListState) {
         snapshotFlow { lazyListState.firstVisibleItemIndex }
@@ -98,12 +101,27 @@ fun HomeFeed(
                 contentPadding = it
             ) {
                 itemsIndexed(distinctFeed, key = { _, post -> post.id }) { index, post ->
-                    PostView(post = post)
+                    PostView(
+                        post = post,
+                        onPostPress = { post ->
+                            navController.navigate(
+                                Screen.PostScreenWithInitialData.createRoute(
+                                    post.id,
+                                    URLEncoder.encode(Gson().toJson(post, Post::class.java))
+                                )
+                            )
+                        },
+                        onImageOpen = {
+                            navController.navigate(Screen.GalleryScreen.createRoute(it))
+                        }
+                    )
                 }
                 if (homeFeedViewModel.isFetchingNextPage.value) {
                     item {
                         Column(
-                            Modifier.padding(24.dp).fillMaxWidth(),
+                            Modifier
+                                .padding(24.dp)
+                                .fillMaxWidth(),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             CircularProgressIndicator()

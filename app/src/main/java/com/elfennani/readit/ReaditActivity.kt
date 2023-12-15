@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.material3.Surface
 import com.elfennani.readit.presentation.ReaditApp
 import com.elfennani.readit.presentation.ui.ReaditTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -24,10 +25,6 @@ class MainActivity : ComponentActivity() {
 
         enableEdgeToEdge()
 
-        setContent {
-            ReaditTheme {
-                ReaditApp(code = code, user = userId)
-            }
-        }
+        setContent { ReaditTheme { Surface { ReaditApp(code = code, user = userId) } } }
     }
 }

@@ -4,6 +4,7 @@
 -keep class com.google.gson.** { *; }
 
 -keep class com.elfennani.readit.data.remote.** { *; }
+-keep class com.elfennani.readit.domain.** { *; }
 
 # Retrofit does reflection on generic parameters. InnerClasses is required to use Signature and
 # EnclosingMethod is required to use InnerClasses.
@@ -53,3 +54,24 @@
 
 # With R8 full mode generic signatures are stripped for classes that are not kept.
 -keep,allowobfuscation,allowshrinking class retrofit2.Response
+
+-keepattributes Signature
+
+-keepattributes *Annotation*
+
+-keep class com.google.** { *; }
+
+-keep class sun.misc.** { *; }
+
+
+-keep class * implements com.google.gson.TypeAdapterFactory
+-keep class * implements com.google.gson.JsonSerializer
+-keep class * implements com.google.gson.JsonDeserializer
+
+-keepattributes Signature
+-keep class com.google.gson.reflect.TypeToken
+-keep class * extends com.google.gson.reflect.TypeToken
+-keep public class * implements java.lang.reflect.Type
+-keepclassmembers,allowobfuscation class * {
+ @com.google.gson.annotations.SerializedName <fields>;
+}

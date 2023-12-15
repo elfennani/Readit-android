@@ -1,5 +1,6 @@
 package com.elfennani.readit.data.remote.dto
 
+import com.elfennani.readit.domain.model.Gallery
 import com.elfennani.readit.domain.model.Image
 import com.elfennani.readit.domain.model.Post
 import com.elfennani.readit.domain.model.Video
@@ -19,6 +20,7 @@ data class PostDto(
     @SerializedName("media_metadata") val mediaMetadata: Map<String, MediaMetadataDto>?,
     @SerializedName("selftext_html") val selftextHtml: String?,
     @SerializedName("is_video") val isVideo: Boolean,
+    @SerializedName("over_18") val over18: Boolean,
     val media: PostMediaDto?,
     val preview: PostPreviewDto?,
 )
@@ -52,6 +54,13 @@ fun PostDto.toPost(): Post {
             else -> null
         }
 
+    val thumbnail =
+        when {
+            preview?.images?.get(0)?.source?.url != null ->
+                Jsoup.parse(preview.images[0].source.url).text()
+            else -> null
+        }
+
     return Post(
         id = id,
         created = created,
@@ -61,14 +70,16 @@ fun PostDto.toPost(): Post {
         subreddit = subreddit,
         title = Jsoup.parse(title).text(),
         subredditDetails = srDetails.toSubreddit(),
-        images = images,
+        gallery = Gallery(images),
         html = if (selftextHtml != null) Jsoup.parse(selftextHtml).text() else null,
+        isNsfw = over18,
         video =
             if (isVideo && media != null)
                 Video(
                     url = Jsoup.parse(media.redditVideo.hlsUrl).text(),
                     width = media.redditVideo.width,
-                    height = media.redditVideo.height
+                    height = media.redditVideo.height,
+                    thumbnail = thumbnail
                 )
             else null
     )
