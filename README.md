@@ -17,10 +17,13 @@ any testing so I don't recommend this repo to anyone that wants to start learnin
 
 ## Screenshots
 
-[![Screenshot 1](screenshots/Screenshot-1.jpg)](screenshots/Screenshot-1.jpg)
-[![Screenshot 2](screenshots/Screenshot-2.jpg)](screenshots/Screenshot-2.jpg)
-[![Screenshot 3](screenshots/Screenshot-3.jpg)](screenshots/Screenshot-3.jpg)
-[![Screenshot 3](screenshots/Screenshot-4.jpg)](screenshots/Screenshot-4.jpg)
+| ![Screenshot 1](screenshots/Screenshot-1.jpg) | ![Screenshot 2](screenshots/Screenshot-2.jpg) |
+|:---------------------------------------------:|:---------------------------------------------:|
+|           *Home Screen Light mode*            |            *Home Screen Dark mode*            |
+
+| ![Screenshot 3](screenshots/Screenshot-3.jpg) | ![Screenshot 4](screenshots/Screenshot-4.jpg) |
+|:---------------------------------------------:|:---------------------------------------------:|
+|             *Saved Posts Screen*              |            *Post Comments Screen*             |
 
 ## Installation
 
