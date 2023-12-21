@@ -13,7 +13,7 @@ any testing so I don't recommend this repo to anyone that wants to start learnin
 - **Read Posts:** Read posts from selected subreddits.
 - **Browse Saved Posts**
 - **Scroll to next comment button**
-- **Zooming on images similar to instagram**
+- **Zooming on images in a similar way to Instagram**
 
 ## Screenshots
 
@@ -43,8 +43,8 @@ any testing so I don't recommend this repo to anyone that wants to start learnin
 ## Known Issues
 
 - Reddit's markdown flavour is not implemented but can be
-- Voting and commenting is implemented yet
-- Error states were not handled instead the app crashes
+- Voting and commenting is not implemented yet
+- Error states were not handled, instead the app crashes
 
 ## Acknowledgments
 
