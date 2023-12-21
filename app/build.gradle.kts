@@ -57,6 +57,12 @@ android {
 
 dependencies {
 
+    implementation("org.commonmark:commonmark:0.21.0")
+    implementation("org.commonmark:commonmark-ext-autolink:0.21.0")
+
+
+    implementation("org.jetbrains:markdown:0.6.0")
+
     implementation("androidx.media3:media3-exoplayer:1.2.0")
     implementation("androidx.media3:media3-exoplayer-hls:1.2.0")
     implementation("androidx.media3:media3-exoplayer-dash:1.2.0")

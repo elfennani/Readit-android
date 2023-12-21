@@ -1,134 +1,94 @@
 package com.elfennani.readit.presentation.homefeed
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.rounded.Menu
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DrawerValue
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.snapshotFlow
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.elfennani.readit.domain.model.Post
-import com.elfennani.readit.presentation.Screen
-import com.elfennani.readit.presentation.homefeed.components.PostView
+import com.elfennani.readit.presentation.common.PostListView
+import com.elfennani.readit.presentation.homefeed.components.HomeTopBar
 import com.elfennani.readit.presentation.homefeed.components.UserProfile
-import com.google.gson.Gson
 import kotlinx.coroutines.launch
-import java.net.URLEncoder
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeFeed(
     navController: NavController,
-    userId: String,
     homeFeedViewModel: HomeFeedViewModel = hiltViewModel()
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-    val lazyListState = rememberLazyListState()
     val scope = rememberCoroutineScope()
     val state = homeFeedViewModel.userState
     val data = homeFeedViewModel.feedState.collectAsState()
     val distinctFeed by remember { derivedStateOf { data.value.distinctBy { it.id } } }
+    val markdown = """
+# Heading 1 
+## Heading 2
+### Heading 3
+#### Heading 4
+##### Heading 5
+###### Heading 6
 
-    LaunchedEffect(key1 = lazyListState) {
-        snapshotFlow { lazyListState.firstVisibleItemIndex }
-            .collect {
-                if (it >= distinctFeed.size - 7) {
-                    homeFeedViewModel.fetchNextPage()
-                }
-            }
-    }
+this is a paragraph, it contains *italic*, **bold**, ***Bold Italic***, ~~strikethrough~~, >!spoiler!<, `code`, and ^superscript text
 
-    ModalNavigationDrawer(
-        drawerState = drawerState,
-        drawerContent = {
-            ModalDrawerSheet(modifier = Modifier.width(300.dp)) {
-                val user = state.value.data
+and [this link](https://redditinc.com) leads to reddit
 
-                UserProfile(user = user)
-            }
+- List 1
+- List 2 **with bold text**
+
+1. what about numbered lists
+2. or ordered in other words
+    1. what about indented list?
+    
+> What about blockquotes
+> Working as intended?
+
+> Yep!
+
+```
+@Composable
+fun RenderMarkdown(){
+    Text(text= "hello world")
+}
+```
+
+hi *there* [link](https://google.com)
+    """.trimIndent()
+
+
+    ModalNavigationDrawer(drawerState = drawerState, drawerContent = {
+        ModalDrawerSheet(modifier = Modifier.width(300.dp)) {
+            val user = state.value.data
+            UserProfile(user = user)
         }
-    ) {
-        Scaffold(
-            topBar = {
-                TopAppBar(
-                    actions = {
-                        IconButton(onClick = {}) {
-                            Icon(Icons.Default.Search, contentDescription = "Search")
-                        }
-                    },
-                    title = { Text(text = "Home") },
-                    navigationIcon = {
-                        IconButton(onClick = { scope.launch { drawerState.open() } }) {
-                            Icon(Icons.Rounded.Menu, contentDescription = null)
-                        }
-                    }
-                )
-            }
-        ) {
-            LazyColumn(
-                state = lazyListState,
-                verticalArrangement = Arrangement.spacedBy(4.dp),
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = it
-            ) {
-                itemsIndexed(distinctFeed, key = { _, post -> post.id }) { index, post ->
-                    PostView(
-                        post = post,
-                        onPostPress = { post ->
-                            navController.navigate(
-                                Screen.PostScreenWithInitialData.createRoute(
-                                    post.id,
-                                    URLEncoder.encode(Gson().toJson(post, Post::class.java))
-                                )
-                            )
-                        },
-                        onImageOpen = {
-                            navController.navigate(Screen.GalleryScreen.createRoute(it))
-                        }
-                    )
-                }
-                if (homeFeedViewModel.isFetchingNextPage.value) {
-                    item {
-                        Column(
-                            Modifier
-                                .padding(24.dp)
-                                .fillMaxWidth(),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            CircularProgressIndicator()
-                        }
-                    }
-                }
-            }
+    }) {
+        Scaffold(topBar = {
+            HomeTopBar(onSearch = { /*TODO*/ }, onDrawerOpen = {
+                scope.launch { drawerState.open() }
+            })
+        }) {
+//            Column(
+//                Modifier
+//                    .padding(it)) {
+//                MDDocument(Parser.Builder().build().parse(markdown) as Document)
+//            }
+            PostListView(
+                posts = distinctFeed,
+                onFetchNextPage = { homeFeedViewModel.fetchNextPage() },
+                isFetchingNextPage = homeFeedViewModel.isFetchingNextPage.value,
+                contentPadding = it,
+                navController = navController
+            )
         }
     }
 }

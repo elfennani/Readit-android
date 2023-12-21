@@ -21,8 +21,10 @@ data class PostDto(
     @SerializedName("selftext_html") val selftextHtml: String?,
     @SerializedName("is_video") val isVideo: Boolean,
     @SerializedName("over_18") val over18: Boolean,
+    @SerializedName("crosspost_parent_list") val crosspost: List<PostDto>?,
     val media: PostMediaDto?,
     val preview: PostPreviewDto?,
+    val selftext: String?,
 )
 
 fun PostDto.toPost(): Post {
@@ -73,6 +75,8 @@ fun PostDto.toPost(): Post {
         gallery = Gallery(images),
         html = if (selftextHtml != null) Jsoup.parse(selftextHtml).text() else null,
         isNsfw = over18,
+        crosspost = if(!crosspost.isNullOrEmpty()) crosspost[0].toPost() else null,
+        md = selftext,
         video =
             if (isVideo && media != null)
                 Video(

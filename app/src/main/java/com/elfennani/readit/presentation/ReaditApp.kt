@@ -50,7 +50,7 @@ fun ReaditApp(code: String?, user: String?) {
             exitTransition = { ExitTransition.None }
         ) {
             val userId = checkNotNull(it.arguments?.getString("userId"))
-            HomeFeed(navController = navController, userId = userId)
+            HomeFeed(navController = navController)
         }
 
         composable(Screen.ExchangeToken.route, Screen.ExchangeToken.createArgs(code)) {

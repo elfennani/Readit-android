@@ -10,7 +10,9 @@ data class Post(
     val commentsSize: Int,
     val subredditDetails: Subreddit,
     val html: String?,
+    val md: String?,
     val gallery: Gallery,
     val video: Video? = null,
     val isNsfw : Boolean = false,
+    val crosspost: Post?
 )

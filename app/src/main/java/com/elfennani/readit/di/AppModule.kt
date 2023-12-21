@@ -4,9 +4,14 @@ import android.content.Context
 import com.elfennani.readit.data.local.SessionDao
 import com.elfennani.readit.data.local.didExpire
 import com.elfennani.readit.data.remote.AuthApi
+import com.elfennani.readit.data.remote.dto.CommentTypeAdapter
+import com.elfennani.readit.data.remote.dto.CommentWrapperDto
 import com.elfennani.readit.data.remote.OAuthApi
 import com.elfennani.readit.data.remote.UserApi
+import com.elfennani.readit.data.remote.dto.PostAdapter
+import com.elfennani.readit.data.remote.dto.PostDetailsDto
 import com.elfennani.readit.data.repository.SessionManager
+import com.google.gson.GsonBuilder
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -72,9 +77,14 @@ class AppModule {
         )
         .build()
 
+    val gson = GsonBuilder()
+      .registerTypeAdapter(CommentWrapperDto::class.java, CommentTypeAdapter())
+      .registerTypeAdapter(PostDetailsDto::class.java, PostAdapter())
+      .create()
+
     return Retrofit.Builder()
       .baseUrl("https://oauth.reddit.com")
-      .addConverterFactory(GsonConverterFactory.create())
+      .addConverterFactory(GsonConverterFactory.create(gson))
       .client(httpClient)
       .build()
       .create(OAuthApi::class.java)

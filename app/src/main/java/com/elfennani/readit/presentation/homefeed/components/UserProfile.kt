@@ -162,6 +162,8 @@ fun UserProfile(user: User?) {
                         withStyle(SpanStyle(fontWeight = FontWeight.SemiBold)) {
                             append(label)
                         }
+
+
                     }
                 }
                 Text(text = labelText(user.totalKarma.toString(), "karma"), fontSize = 14.sp)
