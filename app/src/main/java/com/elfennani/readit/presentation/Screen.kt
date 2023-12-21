@@ -85,4 +85,11 @@ sealed class Screen(val route: String, val navArgs: List<NamedNavArgument> = emp
             return "gallery/$galleryEncoded"
         }
     }
+
+    data object SavedScreen: Screen(
+        route = "saved/{username}",
+        navArgs = listOf(
+            navArgument("username") {type = NavType.StringType}
+        )
+    )
 }

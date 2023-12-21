@@ -1,5 +1,6 @@
 package com.elfennani.readit.presentation.postscreen
 
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
@@ -11,8 +12,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.ArrowDownward
 import androidx.compose.material3.Card
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -24,8 +27,10 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.RectangleShape
@@ -35,6 +40,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.elfennani.readit.presentation.common.PostView
+import kotlinx.coroutines.launch
 import org.commonmark.ext.autolink.AutolinkExtension
 import org.commonmark.node.Document
 import org.commonmark.parser.Parser
@@ -45,28 +51,57 @@ import se.hellsoft.markdowncomposer.MDDocument
 fun PostScreen(
     postScreenViewModel: PostScreenViewModel = hiltViewModel(), navController: NavController
 ) {
+    val lazyState = rememberLazyListState()
     val post by remember { postScreenViewModel.post }
     val comments by postScreenViewModel.comments.collectAsState()
-
+    val coroutineScope = rememberCoroutineScope()
+    val filteredComments by remember {
+        derivedStateOf { comments.filter { it.more == null || it.more.id != "_" } }
+    }
+    val scrollToNext: (Int) -> Unit = {
+        Log.d("FIRSTITEM", it.toString())
+        val firstItemIndex = (it - 1).coerceAtLeast(0)
+        filteredComments.subList(firstItemIndex, filteredComments.size).indexOfFirst {
+            if(it.comment != null){
+                it.comment.depth == 0
+            }else{
+                it.more?.depth == 0
+            }
+        }.let {
+            if(it != -1){
+                coroutineScope.launch {
+                    lazyState.animateScrollToItem(firstItemIndex + it + 1)
+                }
+            }
+        }
+    }
 
     Scaffold(topBar = {
-        TopAppBar(navigationIcon = {
-            IconButton(onClick = { navController.popBackStack() }) {
-                Icon(Icons.Rounded.ArrowBack, contentDescription = null)
+        TopAppBar(
+            navigationIcon = {
+                IconButton(onClick = { navController.popBackStack() }) {
+                    Icon(Icons.Rounded.ArrowBack, contentDescription = null)
+                }
+            }, 
+            title = {
+                if (post != null) {
+                    Text(
+                        text = post!!.title,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                } else {
+                    Text(text = "Post")
+                }
+            },
+            actions = {
+                IconButton(onClick = {scrollToNext(lazyState.firstVisibleItemIndex+1)}) {
+                    Icon(imageVector = Icons.Rounded.ArrowDownward, contentDescription = null)
+                }
             }
-        }, title = {
-            if (post != null) {
-                Text(
-                    text = post!!.title,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-            } else {
-                Text(text = "Post")
-            }
-        })
+        )
     }) {
-        LazyColumn(contentPadding = it) {
+        LazyColumn(contentPadding = it, state = lazyState) {
             post?.let { post ->
                 item {
                     PostView(post = post, compact = false)
@@ -74,7 +109,7 @@ fun PostScreen(
                 }
             }
 
-            items(comments,
+            items(filteredComments,
                 key = { comment -> comment.comment?.id ?: comment.more?.id ?: "" }) { comment ->
                 val depth = comment.comment?.depth ?: comment.more?.depth ?: 0
                 Card(

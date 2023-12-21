@@ -16,6 +16,7 @@ import com.elfennani.readit.presentation.gallery.GalleryScreen
 import com.elfennani.readit.presentation.homefeed.HomeFeed
 import com.elfennani.readit.presentation.login.LoginScreen
 import com.elfennani.readit.presentation.postscreen.PostScreen
+import com.elfennani.readit.presentation.saved.SavedScreen
 import com.google.gson.Gson
 import java.net.URLDecoder
 
@@ -83,6 +84,15 @@ fun ReaditApp(code: String?, user: String?) {
             val gallery = Gson().fromJson(URLDecoder.decode(galleryEncoded), Gallery::class.java)
 
             GalleryScreen(gallery = gallery)
+        }
+
+        composable(
+            Screen.SavedScreen.route,
+            Screen.SavedScreen.navArgs,
+            exitTransition = { fadeOut() },
+            popEnterTransition = { fadeIn() },
+        ) {
+            SavedScreen(navController)
         }
     }
 }

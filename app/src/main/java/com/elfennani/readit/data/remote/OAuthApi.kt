@@ -28,4 +28,11 @@ interface OAuthApi {
 
     @GET("/comments/{id}?threaded=false")
     suspend fun  getPostComments(@Path("id") id:String) : PostDetailsDto
+
+    @GET("https://oauth.reddit.com/user/{username}/saved?sr_detail=true&type=links")
+    suspend fun getSavedPosts(
+        @Path("username") username: String,
+        @Query("after") after: String? = null
+    ): DataDto<ListingDto<DataDto<PostDto>>>
+
 }
